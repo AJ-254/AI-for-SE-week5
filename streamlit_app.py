@@ -1,68 +1,62 @@
 import streamlit as st
-import pandas as pd
 import joblib
+import numpy as np
 
-# Load the trained model
-model = joblib.load("maternal_risk_model.pkl")
-
-# Page configuration
-st.set_page_config(page_title="Maternal Health Risk Predictor", page_icon="👩‍🍼", layout="centered")
-
-# App title and description
-st.title("👩‍⚕️ Maternal Health Risk Prediction App")
-st.markdown("""
-This AI-powered app predicts a **maternal health risk level** (Low, Medium, or High) 
-based on clinical data.  
-Fill in the fields below and click **Predict Risk** to get your result.
-""")
-
-# Input form
-with st.form("risk_form"):
-    st.subheader("🔢 Enter Patient Details")
-
-    age = st.number_input("Age (years)", min_value=15, max_value=50, value=25)
-    systolic_bp = st.number_input("Systolic Blood Pressure (mmHg)", min_value=80, max_value=200, value=120)
-    diastolic_bp = st.number_input("Diastolic Blood Pressure (mmHg)", min_value=50, max_value=130, value=80)
-    bs = st.number_input("Blood Sugar (mmol/L)", min_value=2.0, max_value=30.0, value=5.0, step=0.1)
-    body_temp = st.number_input("Body Temperature (°C)", min_value=34.0, max_value=42.0, value=36.5, step=0.1)
-    heart_rate = st.number_input("Heart Rate (bpm)", min_value=40, max_value=160, value=80)
-
-    submitted = st.form_submit_button("Predict Risk")
-
+# === Load model and scaler ===
+model = joblib.load("maternal_health_model.pkl")
 scaler = joblib.load("scaler.pkl")
-input_data = scaler.transform([[age, systolic_bp, diastolic_bp, bs, body_temp, heart_rate]])
-prediction = model.predict(input_data)
 
-# Prediction logic
-if submitted:
-    # Prepare input data as DataFrame
-    input_data = pd.DataFrame({
-        'Age': [age],
-        'SystolicBP': [systolic_bp],
-        'DiastolicBP': [diastolic_bp],
-        'BS': [bs],
-        'BodyTemp': [body_temp],
-        'HeartRate': [heart_rate]
-    })
+# === App Title ===
+st.set_page_config(page_title="Maternal Health Risk Predictor", page_icon="👩‍🍼")
+st.title("👩‍🍼 Maternal Health Risk Prediction App")
+st.markdown("Use this AI-powered tool to estimate maternal health risk based on key medical indicators.")
 
-    # Make prediction
-    prediction = model.predict(input_data)[0]
+# === Sidebar Info ===
+st.sidebar.header("About the App")
+st.sidebar.info(
+    "This predictive model uses health indicators such as blood pressure, blood sugar, and heart rate "
+    "to classify maternal health risk into **Low**, **Medium**, or **High** categories.\n\n"
+    "⚠️ This tool is for educational purposes only and should not replace professional medical advice."
+)
 
-    # Interpret prediction
-    risk_label = {0: "Low Risk", 1: "Mid Risk", 2: "High Risk"}.get(prediction, "Unknown")
+# === Input Fields ===
+st.subheader("Enter Patient Health Data")
 
-    # Display result
-    st.success(f"🩺 **Predicted Maternal Health Risk: {risk_label}**")
+col1, col2, col3 = st.columns(3)
 
-    # Add extra feedback
-    if risk_label == "High Risk":
-        st.warning("⚠️ High Risk detected! Immediate medical attention is advised.")
-    elif risk_label == "Mid Risk":
-        st.info("🧡 Medium Risk — regular monitoring and lifestyle adjustments are recommended.")
+with col1:
+    age = st.number_input("Age (years)", 15, 50, 25)
+    body_temp = st.number_input("Body Temperature (°C)", 35.0, 40.0, 36.8)
+
+with col2:
+    systolic_bp = st.number_input("Systolic BP (mmHg)", 90, 200, 120)
+    diastolic_bp = st.number_input("Diastolic BP (mmHg)", 60, 120, 80)
+
+with col3:
+    bs = st.number_input("Blood Sugar (mmol/L)", 2.0, 15.0, 4.5)
+    heart_rate = st.number_input("Heart Rate (bpm)", 50, 150, 75)
+
+# === Prediction Button ===
+if st.button("🔍 Predict Risk Level"):
+    # Prepare input
+    input_data = np.array([[age, systolic_bp, diastolic_bp, bs, body_temp, heart_rate]])
+    input_scaled = scaler.transform(input_data)
+    
+    # Predict
+    prediction = model.predict(input_scaled)[0]
+    risk_labels = {0: "Low Risk", 1: "Medium Risk", 2: "High Risk"}
+    risk_level = risk_labels[prediction]
+
+    # Display Result
+    st.markdown("---")
+    if risk_level == "Low Risk":
+        st.success("✅ Prediction: **Low Risk**\n\nEverything looks good! Keep maintaining a healthy lifestyle.")
+    elif risk_level == "Medium Risk":
+        st.warning("⚠️ Prediction: **Medium Risk**\n\nRegular checkups and monitoring are advised.")
     else:
-        st.balloons()
-        st.success("✅ Low Risk — maintain a healthy lifestyle!")
+        st.error("🚨 Prediction: **High Risk**\n\nSeek immediate medical attention for proper evaluation.")
 
-# Footer
-st.markdown("---")
-st.caption("Developed as part of AI Week 5 Assignment • Powered by Streamlit & scikit-learn")
+    st.markdown("---")
+
+# === Footer ===
+st.caption("Developed as part of the **AI for Software Engineering** course | Week 5 Assignment 💡")
