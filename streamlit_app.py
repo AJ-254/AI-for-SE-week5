@@ -3,7 +3,7 @@ import pandas as pd
 import joblib
 
 # Load the trained model
-model = joblib.load("maternal_health_risk_model.pkl")
+model = joblib.load("maternal_risk_model.pkl")
 
 # Page configuration
 st.set_page_config(page_title="Maternal Health Risk Predictor", page_icon="👩‍🍼", layout="centered")
