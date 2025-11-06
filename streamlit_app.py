@@ -3,7 +3,7 @@ import joblib
 import numpy as np
 
 # === Load model and scaler ===
-model = joblib.load("maternal_health_model.pkl")
+model = joblib.load("maternal_risk_model.pkl")
 scaler = joblib.load("scaler.pkl")
 
 # === App Title ===
