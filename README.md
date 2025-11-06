@@ -54,7 +54,7 @@ A reliable machine learning model that predicts maternal risk levels with high i
 ---
 
 ## Deployment
-Deployed and hosted on streamlit: [👩‍🍼Maternal Health Risk Prediction App](https://maternalhealthcheck.streamlit.app/)
+Deployed and hosted with streamlit: [👩‍🍼Maternal Health Risk Prediction App](https://maternalhealthcheck.streamlit.app/)
 
 ---
 
@@ -76,6 +76,7 @@ Focused on **Health Impact through AI Innovation**
 
 ## License  
 This project is open-source and available under the [MIT License](LICENSE).
+
 
 
 
