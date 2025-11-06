@@ -29,6 +29,10 @@ with st.form("risk_form"):
 
     submitted = st.form_submit_button("Predict Risk")
 
+scaler = joblib.load("scaler.pkl")
+input_data = scaler.transform([[age, systolic_bp, diastolic_bp, bs, body_temp, heart_rate]])
+prediction = model.predict(input_data)
+
 # Prediction logic
 if submitted:
     # Prepare input data as DataFrame
